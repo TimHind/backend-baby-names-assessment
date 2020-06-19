@@ -34,8 +34,8 @@ Suggested milestones for incremental development:
 import sys
 import re
 import argparse
-
-
+REGEX = re.compile('<td>(\w+)</td><td>(\w+)</td><td>(\w+)</td>')
+REGEX_FILENAME = re.compile('baby(\w+).html')
 def extract_names(filename):
     """
     Given a single file name for babyXXXX.html, returns a
@@ -43,8 +43,18 @@ def extract_names(filename):
     the name-rank strings in alphabetical order.
     ['2006', 'Aaliyah 91', 'Aaron 57', 'Abagail 895', ...]
     """
-    names = []
-    # +++your code here+++
+    names = re.findall(REGEX_FILENAME, filename)
+    names_dict = {}
+    with open (filename) as f:
+        matches = re.findall(REGEX, '\n'.join(f))
+        for match in matches:
+            if match[1] not in names_dict:
+                names_dict[match[1]] = match[0]
+            if match[2] not in names_dict:
+                names_dict[match[2]] = match[0]
+        keys_list = sorted(names_dict.keys())
+        for name in keys_list:
+            names.append(name + ' ' + names_dict[name]) 
     return names
 
 
@@ -83,7 +93,17 @@ def main(args):
     # or to write the list to a summary file (e.g. `baby1990.html.summary`).
 
     # +++your code here+++
+    if create_summary:
+        for filename in file_list:
+            names = extract_names(filename) 
+            names.append(filename)
 
+    else:
+        for filename in file_list:
+            names = extract_names(filename)
+            for name in names:
+                print(name)
+    
 
 if __name__ == '__main__':
     main(sys.argv[1:])
